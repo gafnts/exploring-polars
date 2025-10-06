@@ -4,13 +4,6 @@
 
 I'm thinking of migrating my data analysis and wrangling workflows to Polars, how possible is that? This repo is meant to explore that question.
 
----
-For the future me:
-
-- After running `gh repo create`, I should `pyenv local x.x.x`
-- Then `poetry init`, and only then `poetry env use $(pyenv which python)`
-- Then, after adding `package-mode: false` to the pyproject, `poetry install`
----
 
 ## The general ideas
 
@@ -19,3 +12,13 @@ For the future me:
 - Polars also has built-in support for lazy evaluation, which allows for more efficient computation by deferring operations until they are needed.
 - Polars has better support for multi-threading and parallelism than pandas, which allows it to take advantage of multiple CPU cores for faster processing.
 
+## Some insights
+
+- Type safety and schema declaration: Polars' `schema_overrides` parameter embodies a modern, type-safe approach inspired by TypeScript and Pydantic. Unlike pandas' string-based `dtype` parameter, Polars uses first-class types (`pl.Categorical`, `pl.Int32`, `pl.Date`) that are more discoverable and type-checker friendly.
+- Less post-processing required: Where pandas often requires additional data cleaning and type coercion after loading, Polars enforces your schema contract upfront. The data is correct by the time it enters your workflow.
+- Fail-fast philosophy: Polars errors immediately on type mismatches at schema definition time, not some transformations later. This Rust-inspired "catch errors early" approach prevents silent bugs and data quality issues from propagating through your pipeline.
+- Expression API Superiority: Polars' expression-based transformations `(pl.col("price").filter(pl.col("quantity") > 0).mean())` are more composable and readable than pandas' assignment-based approach. It reads like SQL but with type safety.
+
+When pandas still wins: The ecosystem integration (`sklearn`, `statsmodels`) and team familiarity still make pandas the pragmatic choice for some scenarios. But for new projects and production pipelines, Polars' strictness becomes a feature, not a limitation.
+
+Polars is what pandas would look like if designed today with Rust's type system discipline and lessons from the TypeScript revolution. It makes the invisible visible and respects the programmer's intelligence.
